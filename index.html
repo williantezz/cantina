@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cantina Tezzari</title>
+<style>
+    body { font-family: Arial; background-color: #fff8e1; margin: 0; }
+    header { background-color: #d32f2f; color: white; padding: 20px; text-align: center; }
+    h1 { margin: 0; }
+    .container { padding: 20px; }
+    .categoria { margin-bottom: 30px; }
+    .produto { background: #fff3e0; border-radius: 10px; padding: 10px; margin-bottom: 10px; }
+    .produto h3 { margin: 0; }
+    button { background-color: #ff9800; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
+    button:hover { background-color: #e65100; }
+    .carrinho { background-color: #ffe0b2; padding: 10px; border-radius: 10px; margin-top: 20px; }
+    input, select { width: 100%; padding: 8px; margin-top: 5px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>🍕 Cantina Tezzari</h1>
+    <p>Delivery de Pizzas e Bebidas</p>
+</header>
+
+<div class="container">
+    <div class="categoria">
+        <h2>Pizzas</h2>
+        <div class="produto">
+            <h3>Pizza de Calabresa - R$ 40,00</h3>
+            <button onclick="adicionar('Pizza de Calabresa', 40)">Adicionar</button>
+        </div>
+        <div class="produto">
+            <h3>Pizza Portuguesa - R$ 45,00</h3>
+            <button onclick="adicionar('Pizza Portuguesa', 45)">Adicionar</button>
+        </div>
+        <div class="produto">
+            <h3>Pizza Marguerita - R$ 42,00</h3>
+            <button onclick="adicionar('Pizza Marguerita', 42)">Adicionar</button>
+        </div>
+    </div>
+
+    <div class="categoria">
+        <h2>Bebidas</h2>
+        <div class="produto">
+            <h3>Refrigerante Lata - R$ 6,00</h3>
+            <button onclick="adicionar('Refrigerante Lata', 6)">Adicionar</button>
+        </div>
+        <div class="produto">
+            <h3>Suco Natural - R$ 8,00</h3>
+            <button onclick="adicionar('Suco Natural', 8)">Adicionar</button>
+        </div>
+        <div class="produto">
+            <h3>Cerveja Long Neck - R$ 9,00</h3>
+            <button onclick="adicionar('Cerveja Long Neck', 9)">Adicionar</button>
+        </div>
+    </div>
+
+    <div class="carrinho">
+        <h2>🛒 Carrinho</h2>
+        <ul id="lista"></ul>
+        <p><strong>Total:</strong> R$ <span id="total">0</span></p>
+
+        <h3>Dados para entrega</h3>
+        <input type="text" id="nome" placeholder="Seu nome">
+        <input type="text" id="endereco" placeholder="Endereço completo">
+        
+        <label>Forma de pagamento:</label>
+        <select id="pagamento">
+            <option value="Dinheiro">Dinheiro</option>
+            <option value="Pix">Pix</option>
+            <option value="Cartão na entrega">Cartão na entrega</option>
+        </select>
+
+        <!-- Info Pix -->
+        <div id="pix-info" style="display:none; margin-bottom: 15px; padding: 10px; background:#e0f7fa; border-radius:8px;">
+            <p><strong>Pagamento via Pix</strong></p>
+            <p>Chave Pix: <code>5548999541113</code></p>
+            <p>Clique no botão para copiar a chave Pix:</p>
+            <button onclick="copiarPix()">Copiar Chave Pix</button>
+            <div style="margin-top:10px;">
+              <img id="pix-qr" src="https://chart.googleapis.com/chart?cht=qr&chs=180x180&chl=00020126360014BR.GOV.BCB.PIX01135548999541113025802BR5913Cantina Tezzari6009Sao Paulo62100508Pagamento520400005303986540440005802BR5925Cantina Tezzari - Delivery6009Sao Paulo62070503***6304B4F5" alt="QR Code Pix">
+            </div>
+        </div>
+
+        <label>Entrega ou Retirada?</label>
+        <select id="entrega">
+            <option value="Entrega">Entrega</option>
+            <option value="Retirada">Retirada</option>
+        </select>
+
+        <button onclick="finalizar()">Finalizar Pedido no WhatsApp</button>
+    </div>
+</div>
+
+<script>
+    let carrinho = [];
+    let total = 0;
+
+    function adicionar(item, preco) {
+        carrinho.push({ item, preco });
+        total += preco;
+        atualizarCarrinho();
+    }
+
+    function atualizarCarrinho() {
+        const lista = document.getElementById('lista');
+        lista.innerHTML = '';
+        carrinho.forEach((p, i) => {
+            const li = document.createElement('li');
+            li.textContent = `${p.item} - R$ ${p.preco}`;
+            lista.appendChild(li);
+        });
+        document.getElementById('total').textContent = total;
+    }
+
+    // Mostrar/ocultar info Pix conforme pagamento
+    const pagamentoSelect = document.getElementById('pagamento');
+    const pixInfo = document.getElementById('pix-info');
+
+    pagamentoSelect.addEventListener('change', () => {
+        if(pagamentoSelect.value === 'Pix'){
+            pixInfo.style.display = 'block';
+        } else {
+            pixInfo.style.display = 'none';
+        }
+    });
+
+    function copiarPix() {
+        const chavePix = '5548999541113';
+        navigator.clipboard.writeText(chavePix).then(() => {
+            alert('Chave Pix copiada para a área de transferência!');
+        }, () => {
+            alert('Falha ao copiar a chave Pix.');
+        });
+    }
+
+    function finalizar() {
+        const nome = document.getElementById('nome').value;
+        const endereco = document.getElementById('endereco').value;
+        const pagamento = document.getElementById('pagamento').value;
+        const entrega = document.getElementById('entrega').value;
+
+        if (!nome) {
+            alert('Por favor, preencha seu nome.');
+            return;
+        }
+
+        if (entrega === 'Entrega' && !endereco) {
+            alert('Por favor, preencha o endereço.');
+            return;
+        }
+
+        let texto = `*🍕 Pedido Cantina Tezzari 🍕*
+
+`;
+        texto += `*Nome:* ${nome}
+`;
+        texto += entrega === 'Entrega' ? `*Endereço:* ${endereco}
+` : `*Retirada no local*
+`;
+        texto += `*Pagamento:* ${pagamento}
+
+`;
+        texto += `*Itens do pedido:*
+`;
+
+        carrinho.forEach(p => {
+            texto += `- ${p.item} - R$ ${p.preco}
+`;
+        });
+
+        texto += `
+*Total:* R$ ${total}
+
+`;
+
+        if(pagamento === 'Pix'){
+            texto += `*Chave Pix para pagamento:* 5548999541113
+
+`;
+        }
+
+        texto += `Aguardo confirmação. 👍`;
+
+        const mensagem = encodeURIComponent(texto);
+        const telefone = '5548999541113';
+        window.open(`https://wa.me/${telefone}?text=${mensagem}`, '_blank');
+    }
+</script>
+
+</body>
+</html>
